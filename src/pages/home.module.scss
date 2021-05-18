@@ -1,1 +1,76 @@
-// TODO
+main {
+    .postContainer {
+        margin-bottom: 3rem;
+    
+        .postTitle {
+            cursor: pointer;
+        }
+    
+        .postTitle h1 {
+            font-size: 1.75rem;
+            font-weight: bold;
+            line-height: 2.125rem;
+            color: var(--heading);
+            text-align: justify;
+            letter-spacing: -0.5px;
+            transition: color 0.2s;
+        }
+    
+        .postTitle:hover h1 {
+            color: var(--highlight);
+        }
+    
+        .postTitle p {
+            font-size: 1.125rem;
+            font-weight: normal;
+            line-height: 1.375rem;
+            text-align: justify;
+            color: var(--body);
+            margin-top: 0.5rem;
+        }
+    
+        .postInfo {
+            margin-top: 1.5625rem;
+            display: flex;
+            color: var(--info);
+    
+            .postDataCreated {
+                display: flex;
+                align-items: center;
+                
+                p {
+                    margin-left: 0.625rem;
+                    margin-right: 1.6875rem;
+                    font-size: 0.875rem;
+                }
+            }
+    
+            .postAuthor {
+                display: flex;
+                align-items: center;
+    
+                p {
+                    margin-left: 0.625rem;
+                    font-size: 0.875rem;
+                }
+            }
+        }
+    }
+    
+    button {
+        &.nextPageButton {
+            margin-top: 1rem;
+            font-size: 1.125rem;
+            font-weight: 600;
+            line-height: 1.375rem;
+            background: var(--background);
+            color: var(--highlight); 
+            border: none;
+            transition: filter 0.2s;
+
+            &:hover {
+                filter: brightness(0.8);
+            }
+        }
+    }
+}

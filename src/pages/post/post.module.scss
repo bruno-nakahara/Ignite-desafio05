@@ -1,1 +1,62 @@
-// TODO
+.banner {
+    width: 1440px;
+    margin: 0 auto;
+    height: 400px;
+    display: flex;
+    justify-content: center;
+    margin-bottom: 5rem;
+}
+
+.postInfo {
+    margin-top: 1.5625rem;
+    margin-bottom: 4rem;
+    display: flex;
+    color: var(--info);
+
+    .postDataCreated {
+        display: flex;
+        align-items: center;
+        
+        p {
+            margin-left: 0.625rem;
+            margin-right: 1.6875rem;
+            font-size: 0.875rem;
+        }
+    }
+
+    .postAuthor {
+        display: flex;
+        align-items: center;
+
+        p {
+            margin-left: 0.625rem;
+            margin-right: 1.6875rem;
+            font-size: 0.875rem;
+        }
+    }
+
+    .postReadTime {
+        display: flex;
+        align-items: center;
+
+        p {
+            margin-left: 0.625rem;
+            font-size: 0.875rem;
+        }
+    }
+}
+
+.contentHeading {
+    font-size: 2.25rem;
+    font-weight: bold;
+    color: var(--heading);
+    margin-bottom: 3rem;
+    margin-top: 3rem;
+}
+
+.contentBody {
+    color: var(--body);
+    font-size: 1.125rem;
+    text-align: justify;
+    line-height: 1.5625rem;
+}
