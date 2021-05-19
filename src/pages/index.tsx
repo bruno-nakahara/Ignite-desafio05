@@ -10,8 +10,8 @@ import { getPrismicClient } from '../services/prismic';
 import commonStyles from '../styles/common.module.scss';
 import styles from './home.module.scss';
 import Link from 'next/link';
-import { useEffect, useState } from 'react';
-import { RichText } from 'prismic-dom';
+import { useState } from 'react';
+
 
 interface Post {
   uid?: string;
@@ -137,6 +137,6 @@ export const getStaticProps: GetStaticProps = async () => {
         next_page: postsResponse.next_page
       }
     },
-    revalidate: 60 * 30,//1 minutes
+    revalidate: 60 * 30,//30 minutes
   }
 };
