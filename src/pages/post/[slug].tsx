@@ -11,7 +11,8 @@ import styles from './post.module.scss';
 import Head from 'next/head';
 import { FiCalendar, FiClock, FiUser } from 'react-icons/fi';
 import { useRouter } from 'next/router';
-import { useEffect } from 'react';
+import { Comments } from '../../components/Comments';
+import { useEffect, useRef } from 'react';
 
 interface Post {
   first_publication_date: string | null;
@@ -37,6 +38,7 @@ interface PostProps {
 export default function Post(props: PostProps) {
     const { post } = props
     const router = useRouter()
+    let commentBox = useRef<HTMLDivElement>()
 
     if (router.isFallback) {
         return <div>Carregando...</div>
@@ -51,18 +53,24 @@ export default function Post(props: PostProps) {
 
     const postReadTime = Math.ceil(bodyLettersCounts / 200)
 
-    // useEffect(() => {
-    //     let script = document.createElement("script");
-    //     let anchor = document.getElementById("inject-comments-for-uterances");
-    //     script.src = "https://utteranc.es/client.js";
-    //     script.setAttribute("crossorigin","anonymous");
-    //     script.async = true;
-    //     script.setAttribute("repo", "https://github.com/bruno-nakahara/Ignite-desafio05.git");
-    //     script.setAttribute("issue-term", "pathname");
-    //     script.setAttribute( "theme", "github-dark-orange");
-    //     anchor.appendChild(script);
-    // }, [])
+    useEffect(() => {
+        let script = document.createElement("script");
+        script.async = true;
+        script.src = 'https://utteranc.es/client.js';
+        script.setAttribute("crossorigin","anonymous");
+        script.setAttribute("repo", "bruno-nakahara/Ignite-desafio05");
+        script.setAttribute("issue-term", "pathname");
+        script.setAttribute( "label", "💬");
+        script.setAttribute( "theme", "github-dark-orange");
 
+        if (commentBox && commentBox.current) {
+            commentBox.current.appendChild(script);
+        } else {
+          console.log(`Error adding utterances comments on: ${commentBox}`);
+        }
+
+    }, [commentBox])
+    
     return (
         <>
             <Head>
@@ -98,16 +106,10 @@ export default function Post(props: PostProps) {
                         <div className={styles.contentBody} dangerouslySetInnerHTML={{ __html: RichText.asText(content.body) }} />
                     </div> 
                 ))}
-            </main>
 
-            <script src="https://utteranc.es/client.js"
-                    repo="[https://github.com/bruno-nakahara/Ignite-desafio05.git]"
-                    issue-term="pathname"
-                    theme="github-dark-orange"
-                    label="Comment"
-                    crossorigin="anonymous"
-                    async>
-            </script>
+                <Comments commentBox={commentBox} />                
+
+            </main>
         </>
     )
 }
