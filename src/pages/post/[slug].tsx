@@ -12,7 +12,8 @@ import Head from 'next/head';
 import { FiCalendar, FiClock, FiUser } from 'react-icons/fi';
 import { useRouter } from 'next/router';
 import { Comments } from '../../components/Comments';
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import Link from 'next/link';
 
 interface Post {
   first_publication_date: string | null;
@@ -33,13 +34,23 @@ interface Post {
 
 interface PostProps {
   post: Post;
+  preview: boolean;
+  updatedAt: string;
+  prev_page: {
+      slug: string | null;
+      title: string | null;
+  };
+  next_page: {
+      slug: string | null;
+      title: string | null;
+  };
 }
 
 export default function Post(props: PostProps) {
-    const { post } = props
-    const router = useRouter()
-    let commentBox = useRef<HTMLDivElement>()
-
+    const { post, preview, updatedAt, prev_page, next_page } = props;
+    const router = useRouter();
+    let commentBox = useRef<HTMLDivElement>();
+  
     if (router.isFallback) {
         return <div>Carregando...</div>
     }
@@ -99,6 +110,13 @@ export default function Post(props: PostProps) {
                         <p>{String(postReadTime)} min</p>
                     </div>
                 </div>
+
+                <div className={styles.updatedPostTime}>
+                    {updatedAt && (
+                        format(new Date(updatedAt), "'* editado em 'd MMM yyyy', às 'HH:mm", { locale: ptBR, })
+                    )}
+                </div>
+                
                 
                 {post.data.content.map((content) => ( 
                     <div key={content.heading}>
@@ -107,7 +125,36 @@ export default function Post(props: PostProps) {
                     </div> 
                 ))}
 
-                <Comments commentBox={commentBox} />                
+                <div className={styles.divisor}></div>
+
+                <div className={styles.linksToOtherPages}>
+                    <div className={styles.previousPage}>
+                        <p>{prev_page.title}</p>
+                        { prev_page.slug && (
+                            <Link href={`/post/${prev_page.slug}`}>
+                                <a>Post anterior</a>
+                            </Link>
+                        )}
+                    </div>
+                    <div className={styles.nextPage}>
+                        <p>{next_page.title}</p>
+                        { next_page.slug && (
+                            <Link href={`/post/${next_page.slug}`}>
+                                <a>Próximo post</a>
+                            </Link>
+                        )}
+                    </div>
+                </div>
+
+                <Comments commentBox={commentBox} />      
+
+                {preview && (
+                    <aside className={commonStyles.previewButton}>
+                        <Link href="/api/exit-preview">
+                            <a>Sair do modo Preview</a>
+                        </Link>
+                    </aside>
+                )}          
 
             </main>
         </>
@@ -130,30 +177,45 @@ export const getStaticPaths: GetStaticPaths = async () => {
   }
 };
 
-export const getStaticProps: GetStaticProps = async context => {
-    const { slug } = context.params
+export const getStaticProps: GetStaticProps = async ({ preview = false, previewData, params }) => {
+    const { slug } = params;
+    let postIndex = 0;
 
     const prismic = getPrismicClient();
-    const response = await prismic.getByUID('posts', String(slug), {});
-    
-    
-    const post = {
-        uid: response.uid,
-        first_publication_date: response.first_publication_date,
-        data: {
-            title: response.data.title,
-            subtitle: response.data.subtitle,
-            banner: {
-                url: response.data.banner.url,
-            },
-            author: response.data.author,
-            content: response.data.content
+    const response = await prismic.query(
+        Prismic.predicates.at('document.type', 'posts'),
+        {
+            ref: previewData?.ref ?? null,
         }
-    }
+    )
+
+    const posts = response.results.map((post, index) => {   
+        if (post.uid == slug) {
+            postIndex = index;
+
+            return {
+                uid: post.uid,
+                first_publication_date: post.first_publication_date,
+                data: {
+                    title: post.data.title,
+                    subtitle: post.data.subtitle,
+                    banner: {
+                        url: post.data.banner.url,
+                    },
+                    author: post.data.author,
+                    content: post.data.content
+                }
+            } 
+        }        
+    })
     
     return {
         props: {
-            post
+            post: posts[postIndex], 
+            preview,
+            updatedAt: response.results[postIndex].last_publication_date,
+            next_page: { slug: response.results[postIndex + 1]?.uid ?? null, title: response.results[postIndex + 1]?.data.title ?? null },
+            prev_page: { slug: response.results[postIndex - 1]?.uid ?? null, title: response.results[postIndex - 1]?.data.title ?? null }
         },
         revalidate: 60 * 30,//30 minutes
     }
